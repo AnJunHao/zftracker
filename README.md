@@ -6,7 +6,7 @@
 
 `zftracker` is a cutting-edge Python library for tracking groups of zebrafish, designed to enhance research efficiency by providing a robust tool for behavioral analysis.
 
-[Demo](https://youtu.be/9jiIeoRqJ-o)
+[Demo](https://youtu.be/g3OHEfJAJtw)
 
 ## Features
 

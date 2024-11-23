@@ -229,7 +229,7 @@ class JoinedTrajectory:
             if isinstance(traj, int):
                 if traj >= 0:
                     self.trajectory.extend((None, ) * traj)
-                    self.confidences.extend((0, ) * traj)
+                    self.confidences.extend(([0., 0., 0.], ) * traj)
                     self.match_types.extend(('None', ) * traj)
                     self.sources.extend(('None', ) * traj)
                 else:
@@ -687,12 +687,12 @@ class JoinedTrajectory:
                     for i in range(length):
                         interpolated_pos = next_pos - next_avg_velocity * (length - i)
                         self.trajectory[start + i] = interpolated_pos
-                        if self.sources[start + i] == 'none':
+                        if self.sources[start + i] in ['none', 'None']:
                             self.sources[start + i] = 'interpolate'
                 elif len(next_velocities) == 0 and self.trajectory[start + length] is not None:
                     for i in range(length):
                         self.trajectory[start + i] = self.trajectory[start + length]
-                        if self.sources[start + i] == 'none':
+                        if self.sources[start + i] in ['none', 'None']:
                             self.sources[start + i] = 'interpolate'
                 else:
                     raise ValueError(
@@ -708,12 +708,12 @@ class JoinedTrajectory:
                     for i in range(length):
                         interpolated_pos = prev_pos + prev_avg_velocity * (i + 1)
                         self.trajectory[start + i] = interpolated_pos
-                        if self.sources[start + i] == 'none':
+                        if self.sources[start + i] in ['none', 'None']:
                             self.sources[start + i] = 'interpolate'
                 elif len(prev_velocities) == 0 and self.trajectory[start - 1] is not None:
                     for i in range(length):
                         self.trajectory[start + i] = self.trajectory[start - 1]
-                        if self.sources[start + i] == 'none':
+                        if self.sources[start + i] in ['none', 'None']:
                             self.sources[start + i] = 'interpolate'
                 else:
                     raise ValueError(
@@ -2824,7 +2824,7 @@ class TrajectoryPoolV2:
 
         self.fragment_timeline = fragment_timeline # A list containing the fragments in each frame. The fragments in each frame is a list of tuples (position, confidence, match_type).
 
-    def coarse_pair(self, traj_length_belief, full_state_length_belief, num_entities=7, verbose=False, detailed_verbose=False):
+    def coarse_pair(self, traj_length_belief, full_state_length_belief, num_entities, verbose=False, detailed_verbose=False):
 
         if full_state_length_belief > traj_length_belief:
             raise ValueError(
@@ -3006,7 +3006,7 @@ class TrajectoryPoolV2:
 
         return pairs
 
-    def fine_pair(self, overlap_length_threshold, full_state_length_belief, num_entities=7, verbose=False, detailed_verbose=False):
+    def fine_pair(self, overlap_length_threshold, full_state_length_belief, num_entities, verbose=False, detailed_verbose=False):
 
         if not self.coarse_paired:
             raise ValueError(
@@ -3094,6 +3094,11 @@ class TrajectoryPoolV2:
                               tuple(awaiting_entry_ids)))
                 awaiting_exit_ids = []
                 awaiting_entry_ids = []
+
+        # In case the final state is not a full state, we need to pair the remaining trajectories.
+        if len(awaiting_exit_ids) > 0 and len(awaiting_entry_ids) > 0:
+            pairs.append((tuple(awaiting_exit_ids),
+                          tuple(awaiting_entry_ids)))
 
         id_mapping = {}
 

@@ -148,9 +148,9 @@ def draw_trajectory_on_video(file_path_list,
             frame_index += 1
 
         out.release()
-    except:
+    except Exception as e:
         out.release()
-        raise ValueError("Error occurred during video writing.")
+        raise ValueError(f"Error occurred during video writing: {e}") from e
 
     return color_mapping
 

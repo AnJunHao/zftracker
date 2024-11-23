@@ -574,6 +574,7 @@ class PipelineV3:
                  geometric_model_path: str,
                  file_path: list,
                  horizontal_cut: tuple,
+                 num_fish: int,
                  doublecheck_normalization_factor: dict = {('head', 'midsec'): 8,
                                                             ('head', 'tail'): 26.620351900862914,
                                                             ('midsec', 'tail'): 19.080064573228345},
@@ -592,8 +593,8 @@ class PipelineV3:
         self.called = False
 
         self.coords_predictor = inference.keypoint.TripleKeypoint(
-            num_entities=7,
-            max_detect=7,
+            num_entities=num_fish,
+            max_detect=num_fish,
             peak_threshold=0.5,
             peak_radius=1,
             average_2x2=False,
@@ -631,7 +632,7 @@ class PipelineV3:
         }
         
         self.tracker = inference.trajectory_v2.TrackerV3(
-            num_keypoints=7,
+            num_keypoints=num_fish,
             distance_threshold_per_frame=3, # Tested on FPS=120
             traj_conf_belief=3, # A 3-node prediction has a conf of roughly 0.8, so 3 means a 4 consecutive 3-node predictions
                                     # 2-node prediction has a conf of roughly 0.55

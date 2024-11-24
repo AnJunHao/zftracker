@@ -9,6 +9,8 @@ from ..util.tqdm import TQDM as tqdm
 from time import time
 from scipy.optimize import root_scalar
 import torch
+import json
+import os
 
 class JoinedTrajectoryV3(JoinedTrajectoryV2):
 
@@ -288,13 +290,56 @@ class TrajectoryPoolV3(TrajectoryPoolV2):
         return np.array(self).transpose(1, 0, 2).reshape(-1, 6 * len(self))
     
     def save_coords_numpy(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         np.save(path, self.coords_numpy())
+
+    def save_coords_csv(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.savetxt(path, self.coords_numpy(), delimiter=",", fmt="%f")
     
     def confs_numpy(self):
         return np.array([traj.confidences for traj in self]).transpose(1, 0, 2).reshape(-1, 3 * len(self))
     
     def save_confs_numpy(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         np.save(path, self.confs_numpy())
+
+    def save_confs_csv(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.savetxt(path, self.confs_numpy(), delimiter=",", fmt="%f")
+
+    def sources_numpy(self):
+        sources = [self[i].sources for i in range(len(self))]
+        return np.array(sources).T
+    
+    def save_sources_numpy(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.save(path, self.sources_numpy())
+
+    def save_sources_csv(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.savetxt(path, self.sources_numpy(), delimiter=",", fmt="%s")
+
+    def match_types_numpy(self):
+        match_types = [self[i].match_types for i in range(len(self))]
+        return np.array(match_types).T
+    
+    def save_match_types_numpy(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.save(path, self.match_types_numpy())
+
+    def save_match_types_csv(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        np.savetxt(path, self.match_types_numpy(), delimiter=",", fmt="%s")
+
+    def breakpoints_dicts(self):
+        breakpoints = [self[i].breakpoints for i in range(len(self))]
+        return breakpoints
+    
+    def save_breakpoints_json(self, path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, 'w') as f:
+            json.dump(self.breakpoints_dicts(), f)
 
     def add_trajectory(self, start_position, start_confidence, start_match_type):
 

@@ -163,12 +163,19 @@ cython_debug/
 
 # Ignore test.py file and ipynb files
 test.py
-*.ipynb
+test.ipynb
 
 # Ignore data directory
 data/
 models/
 clips/
+outputs/
+
+# Ignore all .csv, .npy, .json, .jsonl files
+*.csv
+*.npy
+*.json
+*.jsonl
 
 # Any pickle files
 *.pickle
